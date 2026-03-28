@@ -1,14 +1,16 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.5'
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.springframework.boot' version '4.0.2'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.erulaev'
 version = '1.0.0-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 repositories {
@@ -16,15 +18,17 @@ repositories {
 }
 
 ext {
-    springCloudVersion = '2023.0.1'
+    springCloudVersion ='2025.1.0'
+    springRetryVersion = '2.0.12'
 }
 
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
-    implementation 'org.glassfish.jaxb:jaxb-runtime'
+    implementation 'org.springframework.boot:spring-boot-starter-aspectj'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
-    implementation 'org.springframework.retry:spring-retry'
+    implementation "org.springframework.retry:spring-retry:${springRetryVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 dependencyManagement {
@@ -35,12 +39,13 @@ dependencyManagement {
 
 bootBuildImage {
     imageName = "${project.name}"
-    environment = ["BP_JVM_VERSION": "17.*"]
+    createdDate = "now"
+    environment = ["BP_JVM_VERSION": "25.*"]
     docker {
         host = "//./pipe/dockerDesktopLinuxEngine"
     }
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
